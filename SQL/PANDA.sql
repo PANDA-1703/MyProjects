@@ -1,0 +1,337 @@
+/* 2.1 */
+DESC PRODUCTS;
+DESC SELLERS;
+
+SELECT*FROM SELLERS;
+SELECT LIMIT, PRICE, DESCRIPTION, CODE, MANUFACTURER FROM PRODUCTS;
+
+SELECT FULL_NAME, AGE FROM SELLERS WHERE POSITION='Продавец';
+
+SELECT*FROM PRODUCTS;
+SELECT DESCRIPTION AS ТОВАР, PRICE AS "ЦЕНА(У.Е.)", PRICE*90 AS "ЦЕНА(РУБ.)" FROM PRODUCTS;
+
+/* 2.2 */
+SELECT*FROM PRODUCTS;
+SELECT DISTINCT MANUFACTURER FROM PRODUCTS;
+
+SELECT*FROM SELLERS;
+SELECT ROWNUM, POSITION, FULL_NAME, EMPLOYMENT_DATE FROM SELLERS WHERE POSITION='Продавец';
+
+/* 3.1 */
+SELECT*FROM SELLERS;
+SELECT FULL_NAME, RESULT FROM SELLERS WHERE RESULT>20000;      /*3.1.1*/
+
+SELECT *FROM OFFICES;
+SELECT CODE, CITY FROM OFFICES WHERE RESULT>PLAN*0.8;          /*3.1.2*/    
+
+SELECT *FROM ORDERS;
+SELECT PRODUCT_MANUFACTURER, ORDER_DATE FROM ORDERS WHERE ORDER_DATE BETWEEN ADD_MONTHS('01.09.11',0) AND ADD_MONTHS('01.01.12',0);     /*3.1.4*/
+
+SELECT*FROM SELLERS;
+SELECT FULL_NAME, POSITION, PLAN, RESULT FROM SELLERS WHERE POSITION='Продавец' AND RESULT NOT BETWEEN PLAN*0.8 AND PLAN*1.2;        /*3.1.5*/
+
+SELECT*FROM SELLERS;                                                                                                               /*3.1.6*/
+SELECT*FROM SELLERS WHERE POSITION='Продавец' AND OFFICE_CODE IN('S01', 'V01', 'V02'); 
+SELECT*FROM SELLERS WHERE POSITION='Продавец' AND OFFICE_CODE NOT IN('S01', 'V01', 'V02');                                           
+SELECT*FROM SELLERS WHERE POSITION='Продавец' AND OFFICE_CODE IN(SELECT CODE FROM OFFICES WHERE CITY IN ('Сарапул','Воткинск'));
+SELECT*FROM SELLERS WHERE POSITION='Продавец' AND OFFICE_CODE IN(SELECT CODE FROM OFFICES WHERE CITY NOT IN ('Сарапул','Воткинск'));
+
+SELECT *FROM ORDERS;
+SELECT PRODUCT_MANUFACTURER, ORDER_DATE FROM ORDERS WHERE ORDER_DATE>ADD_MONTHS('01.09.11',0) AND ORDER_DATE<ADD_MONTHS('01.01.12',0);     /*3.1.7 (3.1.4)*/
+SELECT* FROM SELLERS WHERE POSITION='Продавец' AND RESULT<PLAN*0.8 OR RESULT>PLAN*1.2;                                                    /*3.1.7 (3.1.5)*/
+SELECT* FROM SELLERS WHERE POSITION='Продавец' AND OFFICE_CODE='S01' OR OFFICE_CODE='S02' OR OFFICE_CODE='V01';                          /*3.1.7 (3.1.6)*/
+SELECT* FROM SELLERS WHERE POSITION='Продавец' AND OFFICE_CODE!='S01' AND OFFICE_CODE!='S02' AND OFFICE_CODE!='V01';
+
+SELECT*FROM PRODUCTS;
+SELECT*FROM PRODUCTS WHERE DESCRIPTION LIKE '%Комплект%' OR DESCRIPTION LIKE '%комплект%';                                            /*3.1.8*/
+
+SELECT*FROM SELLERS;
+SELECT*FROM SELLERS WHERE POSITION='Продавец' AND FULL_NAME LIKE '%ич%' OR FULL_NAME LIKE '%ыч%';                          /*3.1.9*/
+SELECT * FROM SELLERS WHERE (PLAN = SELLER_ID) OR (AGE = 33);    /*(NULL OR TRUE = TRUE)*/                                       /*3.1.13*/
+SELECT * FROM SELLERS WHERE (PLAN = SELLER_ID) AND (AGE = 33);  /*(NULL AND TRUE = NULL)*/                                                                                                                             
+SELECT * FROM SELLERS WHERE NOT ((PLAN = SELLER_ID) OR (AGE > 50));  /*(NULL OR FALSE = NULL)*/
+SELECT * FROM SELLERS WHERE NOT ((PLAN = SELLER_ID) AND (AGE > 50));  /*(NULL AND FALSE = FALSE)*/
+
+
+
+/*3.2*/
+SELECT*FROM OFFICES ORDER BY RESULT-PLAN;                                                                                  /*3.2.1*/
+SELECT*FROM PRODUCTS ORDER BY CODE DESC, DESCRIPTION;                                                                     /*3.2.2*/
+SELECT *FROM (SELECT*FROM SELLERS ORDER BY FULL_NAME)WHERE ROWNUM<6;                                                     /*3.2.3*/
+
+
+/*4.1*/
+SELECT FULL_NAME AS "Фамилия И.О.", POSITION, PLAN*1.15 AS "PLAN NEXT MONTHS" FROM SELLERS WHERE POSITION='Продавец';             /*4.1.1*/
+SELECT FULL_NAME, (RESULT-PLAN)*0.07 AS "Премия" FROM (SELECT*FROM SELLERS WHERE RESULT-PLAN>0) ORDER BY OFFICE_CODE;            /*4.1.2*/
+SELECT FULL_NAME, TO_CHAR(AGE, 'RN') FROM SELLERS WHERE MOD(AGE,2)=0 ORDER BY AGE DESC;                                         /*4.1.3*/
+
+/*4.2*/
+SELECT SUBSTR(FULL_NAME,1,INSTR(FULL_NAME,' ',1,1)-1)||' принят в '|| TO_CHAR(EMPLOYMENT_DATE,'YYYY')|| ' году ' "ФАМИЛИЯ И ГОД ПРИЕМА" 
+FROM SELLERS WHERE EMPLOYMENT_DATE IS NOT NULL;                                                                                /*4.2.1*/
+SELECT LPAD(UPPER(DESCRIPTION),20) SPISOK FROM PRODUCTS;                                                                       /*4.2.2*/
+
+/*4.3*/
+SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') AS "Местное врем" FROM DUAL;                                            /*4.3.1*/
+
+SELECT CASE
+WHEN INSTR(TO_CHAR(SYSDATE, 'MONTH'), 'Т ')>0 THEN TO_CHAR(SYSDATE, 'DD') || ' ' || RTRIM(TO_CHAR(SYSDATE, 'MONTH')) || 'А ' || TO_CHAR(SYSDATE, 'YYYY') || ' года'
+WHEN INSTR(TO_CHAR(SYSDATE, 'MONTH'), 'Т ')=0 THEN TO_CHAR(SYSDATE, 'DD') || ' ' || RTRIM(TO_CHAR(SYSDATE, 'MONTH'), 'Й ') || 'Я ' || TO_CHAR(SYSDATE, 'YYYY') || ' года'
+END 
+FROM DUAL;                                                                                                          /*4.3.3*/
+
+SELECT TO_CHAR(SYSDATE + 1/24, 'YYYY-MM-DD HH24:MI:SS') AS "Местное время + 1 час" FROM DUAL;                          /*4.3.4*/
+
+/*4.4*/
+SELECT 11+'11', 11 -'10', '4'-4, 11/'11', 11*'11'
+FROM DUAL;
+SELECT '11'+'4','4'-'11', '11'-'4', '11'/'11', '11'*'4'
+FROM DUAL;
+SELECT '11' + TO_DATE('01.11.2019', 'DD.MM.YYYY')
+FROM DUAL;
+SELECT 11 + TO_DATE('01.11.2019', 'DD.MM.YYYY')
+FROM DUAL;                                                                                                          /*4.4.1*/
+
+/*4.5*/
+SELECT CODE ||' - '|| CITY AS "Код и город оф.", CASE 
+WHEN (RESULT>=PLAN) then 'план выполнен'
+WHEN (RESULT<PLAN) then 'план не выполнен'
+ELSE 'неизвестно'
+END AS "Результат" FROM OFFICES;                                                                               /*4.5.2*/
+
+SELECT USER AS "Пользователь", TO_CHAR(SYSDATE,'YYYY-MM-DD HH24:MI:SS') AS "Местное врем" FROM DUAL;             /*4.5.3*/
+
+/*4.6*/
+SELECT PRODUCT_CODE, PRODUCT_MANUFACTURER, SUM(amount)
+FROM ORDERS GROUP BY PRODUCT_CODE, PRODUCT_MANUFACTURER;                                                       /*4.6.1*/
+
+SELECT OFFICE_CODE, AVG(PERC) FROM (SELECT ROUND(SUM(RESULT)/SUM(PLAN) * 100, 2) AS PERC,OFFICE_CODE 
+FROM SELLERS GROUP BY OFFICE_CODE) GROUP BY OFFICE_CODE;
+SELECT ROUND(SUM(RESULT) / SUM(PLAN) * 100, 2) AS PROCENT FROM SELLERS;                                        /*4.6.2*/
+
+SELECT SELLER_ID, SUM(AMOUNT), SUM(TOTAL_SUM) FROM ORDERS GROUP BY SELLER_ID;                                               /*4.6.4*/
+
+/*4.7*/
+SELECT MIN(RESULT) AS "MIN and MAX" FROM SELLERS UNION SELECT MAX(RESULT) FROM SELLERS;
+SELECT MIN(RESULT), MAX(RESULT) FROM SELLERS;                                                                            /*4.7.1*/
+
+SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS')FROM DUAL
+UNION 
+SELECT TO_CHAR(SYSDATE + 1, 'YYYY-MM-DD HH24:MI:SS') FROM DUAL
+UNION 
+SELECT TO_CHAR(SYSDATE + 2, 'YYYY-MM-DD HH24:MI:SS') FROM DUAL;                                                          /*4.7.3*/
+
+SELECT SUM(TOTAL_SUM), PRODUCT_MANUFACTURER FROM ORDERS GROUP BY PRODUCT_MANUFACTURER
+UNION
+SELECT SUM(TOTAL_SUM), 'ALL' FROM ORDERS;                                                                                 /*4.7.5*/
+
+
+/*5.1*/
+INSERT INTO PRODUCTS VALUES ('K1B','K1','Комплект болтов',20,100);                                                           /*5.1.1*/
+SELECT*FROM ORDERS;
+INSERT INTO ORDERS (ref_number, order_date, amount, total_sum, client_id, product_manufacturer, product_code, seller_id) 
+VALUES (201005, TO_DATE('25.10.19','DD.MM.RR'), 9, 200, 2111, 'MFB', 'P04', 103);                                          /*5.1.2*/
+
+/*5.2*/
+INSERT INTO PRICELIST_LINES (PRODUCT_CODE,PRODUCT_NAME,PRODUCT_PRICE) SELECT MANUFACTURER||'_'||CODE, DESCRIPTION, PRICE     
+FROM PRODUCTS WHERE MANUFACTURER != 'ZOM';                                                                                   /*5.2.1*/
+SELECT*FROM PRICELIST_LINES;
+
+SELECT 'INSERT INTO PRODUCTS VALUES('||''''||MANUFACTURER||''''||', '||''''||CODE||''''|| ', '||''''||DESCRIPTION||''''||', '||PRICE||', '||LIMIT||');' 
+FROM PRODUCTS;                                                                                                                /*5.2.2*/     
+
+/*5.3*/
+UPDATE SELLERS
+SET FULL_NAME = 'Симонова Екатерина'
+WHERE ID = 107;   
+/*SELECT*FROM SELLERS; */                                                                             /*5.3.1*/
+
+UPDATE PRICELIST_LINES
+SET PRODUCT_PRICE = PRODUCT_PRICE * 1.15;                   
+/*SELECT*FROM PRICELIST_LINES;    */                                                            /*5.3.2*/
+
+/*5.4*/
+DELETE PRICELIST_LINES WHERE PRODUCT_CODE = 'ZSM_PS03';                                     /*5.4.1*/
+DELETE ORDERS WHERE CLIENT_ID = 2126;                                                     /*5.4.3*/
+DELETE ORDERS WHERE ORDER_DATE < TO_DATE('15.11.02', 'DD.MM.RR');                        /*5.4.4*/
+
+/*5.5*/
+BEGIN
+INSERT INTO ORDERS VALUES(201023, TO_DATE('25.10.19','DD.MM.RR'), 9, 200, 2111, 'MFB', 'P04', 103);
+UPDATE SELLERS
+SET RESULT = RESULT + 111
+WHERE ID = 103;
+UPDATE OFFICES
+SET RESULT = RESULT + 111
+WHERE CODE = 'SO1';
+COMMIT;
+END;                                                                                /*5.5.6*/
+
+/*6.1*/
+DROP TABLE CITYES;
+CREATE TABLE CITYES 
+(REGION VARCHAR2(30 CHAR),
+CITY VARCHAR2(30 CHAR) NOT NULL,
+POPULATION NUMBER(30),
+PRIMARY KEY (CITY),
+CONSTRAINT POPULATION_MORE_ZERO CHECK( POPULATION>0));
+INSERT INTO CITYES (REGION, CITY) SELECT REGION, CITY FROM OFFICES GROUP BY CITY, REGION;           
+/*SELECT * FROM CITYES                                                                 /*6.1.1*/
+
+DROP TABLE ГРУППЫ;
+CREATE TABLE ГРУППЫ
+   (ИД NUMBER(5,0) NOT NULL,
+   НОМЕР VARCHAR2(10) NOT NULL,
+   ГОД CHAR(4) NOT NULL,
+   ПРИМЕЧАНИЕ VARCHAR2(30),
+   PRIMARY KEY (ИД),
+   CONSTRAINT ГРУППА_ГОД UNIQUE (НОМЕР, ГОД),
+   CONSTRAINT РАБОЧИЙ_ГОД CHECK (ГОД BETWEEN 2010 AND 2020));
+   
+DROP TABLE СТУДЕНТЫ;
+CREATE TABLE СТУДЕНТЫ
+   (ИД NUMBER(5,0) NOT NULL,
+   ЗАЧЕТКА VARCHAR2(10) NOT NULL,
+   ФИО VARCHAR2(30) NOT NULL,
+   ГРУППА_ИД NUMBER(5,0) NOT NULL,
+   PRIMARY KEY (ИД),
+   FOREIGN KEY (ГРУППА_ИД) REFERENCES ГРУППЫ ON DELETE CASCADE);
+
+INSERT INTO ГРУППЫ (ИД, НОМЕР, ГОД, ПРИМЕЧАНИЕ) VALUES (1, '1', '2016', 'Нет');
+INSERT INTO СТУДЕНТЫ (ИД, ЗАЧЕТКА, ФИО, ГРУППА_ИД) VALUES (1, '213564', 'Малых Константин Викторович', 1);
+
+DELETE FROM ГРУППЫ WHERE ИД = 1;                                               /*6.1.2*/
+
+
+/*6.2*/
+
+ALTER TABLE СТУДЕНТЫ 
+    MODIFY ФИО VARCHAR2(40);
+    
+INSERT INTO СТУДЕНТЫ VALUES (2121, '213575568', 'Oроророро Oро Pоророророророророророр', 2333);
+
+ALTER TABLE СТУДЕНТЫ 
+    MODIFY ФИО VARCHAR2(30);                                                              /*6.2.1*/
+    
+DROP TABLE ГРУППЫ CASCADE CONSTRAINTS;
+DROP TABLE СТУДЕНТЫ;                                                                      /*6.5.2*/
+
+
+/*6.3*/
+DROP TABLE TARTAR;
+CREATE TABLE TARTAR(
+    WORDS VARCHAR2(30 CHAR) NOT NULL);
+
+BEGIN
+FOR i IN 1..1001 LOOP
+    INSERT INTO TARTAR VALUES (DBMS_RANDOM.STRING('r',  30));
+END LOOP;
+END;
+
+SELECT SYSTIMESTAMP FROM DUAL;
+SELECT WORDS FROM TARTAR WHERE WORDS LIKE '%Rr%';
+SELECT SYSTIMESTAMP FROM DUAL;
+
+CREATE INDEX IND_WORDS ON TARTAR (WORDS);                                           /*6.3.2*/
+
+   
+/*7.1*/
+SELECT SELLERS.FULL_NAME, OFFICES.CITY FROM SELLERS, OFFICES;
+SELECT SELLERS.FULL_NAME, OFFICES.CITY FROM SELLERS, OFFICES WHERE OFFICES.CODE = SELLERS.OFFICE_CODE;
+SELECT S.FULL_NAME, O.CITY FROM SELLERS S LEFT JOIN OFFICES O ON O.CODE = S.OFFICE_CODE;                /*7.1.1*/
+
+SELECT O.ORDER_DATE, P.DESCRIPTION, P.MANUFACTURER 
+FROM ORDERS O JOIN PRODUCTS P ON O.PRODUCT_CODE = P.CODE AND O.PRODUCT_MANUFACTURER = P.MANUFACTURER ORDER BY P.MANUFACTURER;    /*7.1.2*/
+
+SELECT C.NAME, C.ID
+FROM SELLERS S JOIN CLIENTS C ON S.ID = C.SELLER_ID 
+WHERE S.FULL_NAME = 'Вахрушев Сергей Степанович';                    /*7.1.4*/
+
+SELECT OFF.CITY, SUM(ORD.TOTAL_SUM) AS TOTAL
+FROM OFFICES OFF JOIN SELLERS S ON OFFICE_CODE = CODE JOIN ORDERS ORD ON ORD.SELLER_ID = S.ID
+GROUP BY OFF.CITY;                                                                                    /*7.1.7*/
+    
+SELECT SEL.FULL_NAME, CL.NAME, P.DESCRIPTION FROM ORDERS ORD 
+JOIN PRODUCTS P ON ORD.PRODUCT_CODE = P.CODE AND ORD.PRODUCT_MANUFACTURER = P.MANUFACTURER 
+JOIN CLIENTS CL ON ORD.CLIENT_ID = CL.ID 
+JOIN SELLERS SEL ON  ORD.SELLER_ID = SEL.ID 
+WHERE ORD.TOTAL_SUM > 10000;                                                     /*7.1.8*/
+
+/*7.2*/
+SELECT FULL_NAME,OFFICE_CODE FROM SELLERS
+WHERE OFFICE_CODE IN (SELECT CODE FROM OFFICES WHERE CITY = 'Ижевск');              /*7.2.1*/
+
+SELECT PRODUCT_MANUFACTURER FROM ORDERS 
+WHERE CLIENT_ID = (SELECT ID FROM CLIENTS WHERE NAME = 'ООО "Памира"');             /*7.2.2*/
+
+SELECT FULL_NAME FROM SELLERS 
+WHERE SELLER_ID = (SELECT SELLER_ID FROM SELLERS WHERE FULL_NAME LIKE 'Зайченко %') AND FULL_NAME NOT LIKE 'Зайченко %';        /*7.2.3*/
+
+SELECT DESCRIPTION FROM PRODUCTS 
+WHERE (MANUFACTURER,CODE) = (SELECT PRODUCT_MANUFACTURER,PRODUCT_CODE FROM ORDERS 
+WHERE CLIENT_ID IN (SELECT ID FROM CLIENTS WHERE NAME LIKE 'ЧП%'));                           /*7.2.7*/
+
+SELECT * FROM (SELECT C.NAME, SUM(O.TOTAL_SUM) AS SCORE, C.CREDIT 
+FROM CLIENTS C JOIN ORDERS O ON C.ID = O.CLIENT_ID GROUP BY C.NAME, C.CREDIT) 
+WHERE SCORE > CREDIT;                                                                   /*7.2.10*/
+
+
+/*8.1*/
+CREATE OR REPLACE VIEW "Zakazy_podchinenih" AS 
+SELECT O.*
+FROM SELLERS S JOIN ORDERS O ON (O.SELLER_ID = S.ID)
+WHERE S.SELLER_ID = 106;                                                         /*8.1.2*/
+
+
+CREATE OR REPLACE VIEW "PRODAVCHY" AS 
+SELECT ID, SUBSTR(FULL_NAME,1,INSTR(FULL_NAME,' ',1,1)+1) || '.' ||CASE  WHEN INSTR(FULL_NAME,' ',1,2)>0 THEN SUBSTR(FULL_NAME,INSTR(FULL_NAME,' ',1,2)+1,1)  || '.' ELSE '' END FIO,
+POSITION, EMPLOYMENT_DATE, PLAN, RESULT, SELLER_ID, OFFICE_CODE FROM SELLERS;                     /*8.1.4*/
+
+CREATE OR REPLACE VIEW "CALENDARIK" ("CALENDAR_NOW") AS 
+SELECT TO_CHAR(TRUNC(SYSDATE,'MONTH')+LEVEL-1,'DD MON YYYY DAY') CALENDAR FROM DUAL
+CONNECT BY LEVEL <= TO_CHAR(LAST_DAY(SYSDATE),'DD');                                       /*8.1.6*/
+
+
+/*9.1*/
+DROP SEQUENCE SELLER_ID_SEQ;
+CREATE SEQUENCE SELLER_ID_SEQ
+MINVALUE 1
+MAXVALUE 45
+START WITH 1
+INCREMENT BY 1
+CACHE 45;
+
+INSERT INTO SELLERS (ID, FULL_NAME) VALUES (SELLER_ID_SEQ.NEXTVAL, 'Василь Пётр Демьянович'); 
+SELECT SELLER_ID_SEQ.CURRVAL FROM DUAL;                                                         /*9.1.1*/
+
+CREATE TRIGGER KRED BEFORE INSERT
+ON CLIENTS FOR EACH ROW
+BEGIN
+IF :NEW.CREDIT IS NULL THEN
+:NEW.CREDIT:= 1000;
+END IF;
+END;
+/
+CREATE SEQUENCE NEWID
+MINVALUE 1
+MAXVALUE 10
+START WITH 1
+INCREMENT BY 1
+CACHE 10;
+
+INSERT INTO CLIENTS (ID, NAME) VALUES (NEWID.NEXTVAL, 'NONAME');                    /*9.1.2*/
+
+CREATE TRIGGER VOZRAST BEFORE INSERT
+ON SELLERS FOR EACH ROW
+BEGIN
+IF :NEW.AGE NOT BETWEEN 18 AND 50  THEN
+RAISE_APPLICATION_ERROR(-20000,'Возраст должен быть в пределе от 18 до 50');
+END IF;
+END;
+/
+
+INSERT INTO SELLERS (ID, FULL_NAME, AGE) VALUES (4, 'NONAME', 51);  
+INSERT INTO SELLERS (ID, FULL_NAME, AGE) VALUES (11, 'NONAME', 20);                     /*9.1.3*/
+
+
+
+
