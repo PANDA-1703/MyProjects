@@ -1,0 +1,6 @@
+﻿  stdafx.cpp
+  ConsoleApplication19.cpp
+d:\университет\учёба\параллелки\метод гаусса для квадр. матрицы\consoleapplication19\consoleapplication19.cpp(53): warning C4244: +=: преобразование "double" в "int", возможна потеря данных
+  LINK : не найден или не выполнена сборка D:\Университет\Учёба\Параллелки\Метод Гаусса для квадр. матрицы\Debug\ConsoleApplication19.exe при последней инкрементной компоновке; выполняется полная компоновка
+  ConsoleApplication19.vcxproj -> D:\Университет\Учёба\Параллелки\Метод Гаусса для квадр. матрицы\Debug\ConsoleApplication19.exe
+  ConsoleApplication19.vcxproj -> D:\Университет\Учёба\Параллелки\Метод Гаусса для квадр. матрицы\Debug\ConsoleApplication19.pdb (Partial PDB)
